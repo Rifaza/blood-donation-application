@@ -1,0 +1,26 @@
+# .NET build output
+**/bin/
+**/obj/
+.vs/
+*.user
+*.suo
+
+# React / Node
+**/node_modules/
+**/dist/
+npm-debug.log*
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+secrets.json
+
+# IDE
+.idea/
+.vscode/
+
+# Operating system
+.DS_Store
+Thumbs.db
