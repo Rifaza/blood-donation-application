@@ -21,10 +21,28 @@ namespace WebApi.Controllers
         }
 
         // GET: api/DCandidates
+        // Added Search donors by blood group
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DCandidate>>> GetDCandidates()
+        public async Task<ActionResult<IEnumerable<DCandidate>>> GetDCandidates(
+            [FromQuery] string? bloodGroup,
+            [FromQuery] string? search)
         {
-            return await _context.DCandidates.ToListAsync();
+            var query = _context.DCandidates.AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(bloodGroup))
+            {
+                query = query.Where(d => d.BloodGroup == bloodGroup);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(d =>
+                    d.FullName.Contains(search));
+            }
+
+            var candidates = await query.ToListAsync();
+
+            return Ok(candidates);
         }
 
         // GET: api/DCandidates/5
@@ -46,10 +64,7 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutDCandidate(int id, DCandidate dCandidate)
         {
-            if (id != dCandidate.id)
-            {
-                return BadRequest();
-            }
+            dCandidate.Id = id;
 
             _context.Entry(dCandidate).State = EntityState.Modified;
 
@@ -80,7 +95,7 @@ namespace WebApi.Controllers
             _context.DCandidates.Add(dCandidate);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDCandidate", new { id = dCandidate.id }, dCandidate);
+            return CreatedAtAction("GetDCandidate", new { id = dCandidate.Id }, dCandidate);
         }
 
         // DELETE: api/DCandidates/5
@@ -101,7 +116,7 @@ namespace WebApi.Controllers
 
         private bool DCandidateExists(int id)
         {
-            return _context.DCandidates.Any(e => e.id == id);
+            return _context.DCandidates.Any(e => e.Id == id);
         }
     }
 }
